@@ -17,7 +17,18 @@
     state: present
   notify: SFTP-Server | Restart sshd
 
-- name: SFTP-Server | Add sshd_config block
+- name: SFTP-Server | Add 'Match User' sshd_config block
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: '# {mark} SFTP-Server {{ item.name }} block'
+    block: |
+      Match User {{ item.name }}
+          ForceCommand internal-sftp {{ sftp_enable_logging | ternary('-l VERBOSE', '') }} {% if item.login_directory is defined %}-d {{ item.login_directory }}{% endif %}{{''}}
+  with_items: "{{ sftp_users }}"
+  when: sftp_enable_login_directory
+  notify: SFTP-Server | Restart sshd
+
+- name: SFTP-Server | Add 'Match Group' sshd_config block
   blockinfile:
     dest: /etc/ssh/sshd_config
     marker: '# {mark} SFTP-Server {{ item.name }} block'
@@ -26,12 +37,10 @@
           ChrootDirectory %h
           AllowTCPForwarding no
           X11Forwarding no
-          ForceCommand internal-sftp {{ sftp_enable_logging | ternary('-l VERBOSE', '') }} {% if item.readonly is defined and item.readonly %}-R{% endif %}
-
+          ForceCommand internal-sftp {{ sftp_enable_logging | ternary('-l VERBOSE', '') }} {% if item.readonly is defined and item.readonly %}-R{% endif %}{{''}}
           PasswordAuthentication {{ sftp_allow_passwords | ternary('yes', 'no') }}
   notify: SFTP-Server | Restart sshd
-  with_items:
-    - "{{ sftp_groups }}"
+  with_items: "{{ sftp_groups }}"
 
 # Create each SFTP user with home directory on the correct partition, and add to SFTP group.
 - name: SFTP-Server | Create sftp users
