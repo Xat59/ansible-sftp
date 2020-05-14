@@ -22,6 +22,7 @@ The following role variables are relevant:
   * Values can be plain strings, or dictionaries containing `name`, `group` and `mode` key/value pairs. (an ansible bug force us to accept only 3 digits for `mode`, not 4)
 * `sftp_allow_passwords`: Whether or not to allow password authentication for SFTP users. Defaults to False. NOTE: if global SSH configuration does not allow to use passwords, setting this to True will not work (see and adapt `PasswordAuthentication` from SSH configuration).
 * `sftp_enable_logging`: Enable logging. Auth logs will be written to `/var/log/sftp/auth.log`, and SFTP activity logs will be written to `/var/log/sftp/verbose.log`. Defaults to False.
+* `sftp_enable_login_directory`: Enable user to log in to a specific subdirectory from its home. When True, can specify a `login_directory` in some or all `sftp_users`. Defaults to False.
 * `sftp_groups`: A list of groups, in map form, containing the following elements:
   * `name`: The Unix name of the group that requires SFTP access.
   * `gid`: The group identifier.
@@ -36,6 +37,7 @@ The following role variables are relevant:
   * `authorized`: An optional list of files placed in `files/` which contain valid public keys for the SFTP user.
   * `sftp_directories`: A list of directories that need to be individually created for an SFTP user. Defaults to a blank list (i.e. "[]").
   * `append`: Boolean to add `sftp_group_name` to the user groups (if any) instead of setting it (default to `False`).
+  * `login_directory`: An optional path for the user to connect to at login when `sftp_enable_login_directory` is set to True.
 * `sftp_nologin_shell`: The "nologin" user shell. (defaults to /sbin/nologin.)
 * `sftp_host_keys`: Dictionnary of ssh host keys. Useful when you want to use custom ssh host keys. For example when you need to share the same ssh host keys on several hosts.
 
