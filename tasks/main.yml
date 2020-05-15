@@ -20,7 +20,7 @@
 - name: SFTP-Server | Add 'Match User' sshd_config block
   blockinfile:
     dest: /etc/ssh/sshd_config
-    marker: '# {mark} SFTP-Server {{ item.name }} block'
+    marker: '# {mark} SFTP-Server {{ item.name }} user block'
     block: |
       Match User {{ item.name }}
           ForceCommand internal-sftp {{ sftp_enable_logging | ternary('-l VERBOSE', '') }} {% if item.login_directory is defined %}-d {{ item.login_directory }}{% endif %}{{''}}
@@ -31,7 +31,7 @@
 - name: SFTP-Server | Add 'Match Group' sshd_config block
   blockinfile:
     dest: /etc/ssh/sshd_config
-    marker: '# {mark} SFTP-Server {{ item.name }} block'
+    marker: '# {mark} SFTP-Server {{ item.name }} group block'
     block: |
       Match Group {{ item.name }}
           ChrootDirectory %h
