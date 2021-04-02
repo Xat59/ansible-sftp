@@ -8,6 +8,12 @@
   with_items:
     - "{{ sftp_groups }}"
 
+# Create main group for SFTP users.
+- name: SFTP-Server | Create main sftp user group
+  group:
+    name: "{{ sftp_group_name }}"
+    state: present
+
 # Necessary for chrooting of SFTP users.
 - name: SFTP-Server | Alter sftp subsystem entry
   lineinfile:
@@ -46,8 +52,8 @@
 - name: SFTP-Server | Create sftp users
   user:
     name: "{{ item.name }}"
-    group: "{{ sftp_group_name }}"
-    groups: "{{ item.groups|join(',') }}"
+    group: "{{ item.group | default(sftp_group_name) }}"
+    groups: "{{ (item.groups|default([])) + [sftp_group_name] }}"
     append: "{{ item.append | default(False) }}"
     home: "{{ item.home | default(sftp_home_partition + '/' + item.name) }}"
     uid: "{{ item.uid | default(omit) }}"
@@ -89,7 +95,7 @@
   file:
     path: "{{ item[0].home | default(sftp_home_partition + '/' + item[0].name) }}/{{ item[1].name | default(item[1]) }}"
     owner: "{{ item[1].owner | default(item[0].name) }}"
-    group: "{{ item[1].group | default(item[0].name) }}"
+    group: "{{ item[1].group | default(item[0].group) }}"
     mode: "{{ item[1].mode | default(0750) }}"
     state: directory
   with_nested:
@@ -101,7 +107,7 @@
   file:
     path: "{{ item[0].home | default(sftp_home_partition + '/' + item[0].name) }}/{{ item[1].name | default(item[1]) }}"
     owner: "{{ item[1].owner | default(item[0].name) }}"
-    group: "{{ item[1].group | default(item[0].name) }}"
+    group: "{{ item[1].group | default(item[0].group) }}"
     mode: "{{ item[1].mode | default(0750) }}"
     state: directory
   with_subelements:

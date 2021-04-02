@@ -1,7 +1,9 @@
 # SFTP-Server
+
 An Ansible role which configures an OpenSSH server for chrooted SFTP access.  The role is built in such a way that it will not unnecessarily alter a user's OpenSSH customisations.  Instead, it simply changes the crucial bits that it needs to, and adds the rest of its configuration in the form of a custom config block (OpenSSH's lack of some form of conf.d/ support forces this behaviour).
 
 ## Requirements
+
 It is advisable that `scp_if_ssh` be set to `true` in the `ssh_connection` section of your `ansible.cfg` file, seeing as how Ansible uses SFTP for file transfers by default, and you can easily lock yourself out of your server's SFTP by using this role.  The SCP fallback will continue to work.  Example config:
 
 ```ini
@@ -14,6 +16,7 @@ scp_if_ssh=True
 Other than that, only Ansible itself is required.  Tested using Ansible 2.0.2.0, 2.2.2.0 and 2.3.0.0, and 2.8.2.x  Works on Ubuntu 14.04, 16.04 and 18.04. Untested on other versions.  Some work has been done on supporting RHEL, though this is not currently officially supported by the original author (further contributions are obviously welcome ;-)
 
 ## Role Variables
+
 The following role variables are relevant:
 
 * `sftp_home_partition`: The partition where SFTP users' home directories will be located.  Defaults to "/home".
@@ -32,6 +35,7 @@ The following role variables are relevant:
   * `password`: A password hash for the user to login with.  Blank passwords can be set with `password: ""`. See 'Notes' section above to checkout out how generate hashed password from plain-text password. NOTE: It appears that `UsePAM yes` and `PermitEmptyPassword yes` need to be set in `sshd_config` in order for blank passwords to work properly.  Making those changes currently falls outside the scope of this role and will need to be done externally. NOTE2: when updating this value, please check `update_password` property.
   * `update_password`: Set it to true when you need to force the password to be changed.
   * `uid` : Specify the user identifier on the system
+  * `group` : Define the main group the user belongs to (default to `sftp_group_name`).
   * `groups` : Define at which groups the user belongs to (i.e. "[]").
   * `shell`: Boolean indicating if the user should have a shell access (default to `True`).
   * `authorized`: An optional list of files placed in `files/` which contain valid public keys for the SFTP user.
@@ -42,6 +46,7 @@ The following role variables are relevant:
 * `sftp_host_keys`: Dictionnary of ssh host keys. Useful when you want to use custom ssh host keys. For example when you need to share the same ssh host keys on several hosts.
 
 ## Notes
+
 * The `sftp_nologin_shell` setting defines the shell assigned to sftp_users when the sftp user's shell is set to False. (The nologin shell ensures the user may only use SFTP and have no other login permissions.) This value may vary depending on the operating system version.
 * Here is the way to generate a hashed password for `sftp_users`. The associated hash must be set into the `password` attribute.
 ```
@@ -60,6 +65,7 @@ localhost | SUCCESS => {
 In the last example, the real password is 'mypa\word'
 
 ## Example Playbook
+
 ```yaml
 ---
 - name: test-playbook | Test sftp-server role
@@ -98,8 +104,10 @@ In the last example, the real password is 'mypa\word'
 ```
 
 ## License
+
 This Ansible role is distributed under the MIT License.  See the LICENSE file for more details.
 
 ## Thanks
+
 - [johanmeiring](https://github.com/johanmeiring) for the hard work
 - [Scalair](https://scalair.fr)
